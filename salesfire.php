@@ -61,17 +61,17 @@ class Salesfire extends Module
      */
     public function install()
     {
-        Configuration::updateValue('SALESFIRE_LIVE_MODE', false);
+        Configuration::updateValue('SALESFIRE_ACTIVE', false);
 
         return parent::install() &&
             $this->registerHook('header') &&
             $this->registerHook('backOfficeHeader') &&
-            $this->registerHook('displayOrderConfirmation');
+            $this->registerHook('actionValidateOrder');
     }
 
     public function uninstall()
     {
-        Configuration::deleteByName('SALESFIRE_LIVE_MODE');
+        Configuration::deleteByName('SALESFIRE_ACTIVE');
 
         return parent::uninstall();
     }
@@ -137,10 +137,10 @@ class Salesfire extends Module
                 'input' => array(
                     array(
                         'type' => 'switch',
-                        'label' => $this->l('Live mode'),
-                        'name' => 'SALESFIRE_LIVE_MODE',
+                        'label' => $this->l('Active'),
+                        'name' => 'SALESFIRE_ACTIVE',
                         'is_bool' => true,
-                        'desc' => $this->l('Use this module in live mode'),
+                        'desc' => $this->l('Activate Salesfire'),
                         'values' => array(
                             array(
                                 'id' => 'active_on',
@@ -157,15 +157,9 @@ class Salesfire extends Module
                     array(
                         'col' => 3,
                         'type' => 'text',
-                        'prefix' => '<i class="icon icon-envelope"></i>',
-                        'desc' => $this->l('Enter a valid email address'),
-                        'name' => 'SALESFIRE_ACCOUNT_EMAIL',
-                        'label' => $this->l('Email'),
-                    ),
-                    array(
-                        'type' => 'password',
-                        'name' => 'SALESFIRE_ACCOUNT_PASSWORD',
-                        'label' => $this->l('Password'),
+                        'desc' => $this->l('Enter your Site ID (This can be found within your Salesfire Dashboard)'),
+                        'name' => 'SALESFIRE_SITE_ID',
+                        'label' => $this->l('Site ID'),
                     ),
                 ),
                 'submit' => array(
@@ -181,9 +175,8 @@ class Salesfire extends Module
     protected function getConfigFormValues()
     {
         return array(
-            'SALESFIRE_LIVE_MODE' => Configuration::get('SALESFIRE_LIVE_MODE', true),
-            'SALESFIRE_ACCOUNT_EMAIL' => Configuration::get('SALESFIRE_ACCOUNT_EMAIL', 'contact@prestashop.com'),
-            'SALESFIRE_ACCOUNT_PASSWORD' => Configuration::get('SALESFIRE_ACCOUNT_PASSWORD', null),
+            'SALESFIRE_ACTIVE' => Configuration::get('SALESFIRE_ACTIVE', true),
+            'SALESFIRE_SITE_ID' => Configuration::get('SALESFIRE_SITE_ID', null),
         );
     }
 
@@ -215,12 +208,44 @@ class Salesfire extends Module
      */
     public function hookHeader()
     {
-        $this->context->controller->addJS($this->_path.'/views/js/front.js');
-        $this->context->controller->addCSS($this->_path.'/views/css/front.css');
+        $this->smarty->assign(
+            array(
+                'sfSiteId' => Tools::safeOutput(Configuration::get('SALESFIRE_SITE_ID'))
+            )
+        );
+        return $this->display(__FILE__, 'salesfire.tpl');
     }
 
-    public function hookDisplayOrderConfirmation()
+    public function hookActionValidateOrder($params)
     {
-        /* Place your code here. */
+        $order = $params->order;
+
+        $sfOrder = array(
+            'sfOrder' => array(
+                'id' => $order->id,
+                'revenue' =>  $order->total_paid_tax_excl,
+                'shipping' =>  $order->total_shipping,
+                'tax' =>  $order->total_paid_tax_incl - $order->total_paid_tax_excl,
+                'currency' =>  $params->currency,
+                'products' => array()
+            )
+        );
+
+        foreach ($params->cart->getProducts() as $product) {
+            $sfOrder['products'][] = array(
+                'sku' =>  $product->reference,
+                'parent_sku' =>  $product->reference,
+                'name' =>  $product->name,
+                'variant' =>  'Colour: Red, Size: Small',
+                'price' =>  25.00,
+                'quantity' =>  1,
+                'currency' => ''
+            );
+        }
+
+        $this->smarty->assign(array(
+            'sfOrder' => $sfOrder
+        ));
+        return $this->display(__FILE__, 'salesfire.tpl');
     }
 }
