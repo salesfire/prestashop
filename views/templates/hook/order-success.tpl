@@ -25,5 +25,5 @@
 
 <script>
   window.sfDataLayer = window.sfDataLayer || [];
-  window.sfDataLayer.push({$sfOrder|@json_encode});
+  window.sfDataLayer.push({$sfOrder|@json_encode nofilter});
 </script>

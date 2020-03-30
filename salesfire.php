@@ -66,7 +66,7 @@ class Salesfire extends Module
         return parent::install() &&
             $this->registerHook('header') &&
             $this->registerHook('backOfficeHeader') &&
-            $this->registerHook('actionValidateOrder');
+            $this->registerHook('orderConfirmation');
     }
 
     public function uninstall()
@@ -216,36 +216,38 @@ class Salesfire extends Module
         return $this->display(__FILE__, 'salesfire.tpl');
     }
 
-    public function hookActionValidateOrder($params)
+    public function hookOrderConfirmation($params)
     {
-        $order = $params->order;
+        $order = $params['order'];
+        $currency = Currency::getCurrencyInstance((int) $order->id_currency);
 
         $sfOrder = array(
-            'sfOrder' => array(
-                'id' => $order->id,
-                'revenue' =>  $order->total_paid_tax_excl,
-                'shipping' =>  $order->total_shipping,
-                'tax' =>  $order->total_paid_tax_incl - $order->total_paid_tax_excl,
-                'currency' =>  $params->currency,
-                'products' => array()
+            'ecommerce' => array(
+                'purchase' => array(
+                    'id' => $order->id,
+                    'revenue' => $order->total_paid_tax_excl,
+                    'shipping' => $order->total_shipping,
+                    'tax' => $order->total_paid_tax_incl - $order->total_paid_tax_excl,
+                    'currency' => $currency->iso_code,
+                    'products' => array()
+                )
             )
         );
 
-        foreach ($params->cart->getProducts() as $product) {
-            $sfOrder['products'][] = array(
-                'sku' =>  $product->reference,
-                'parent_sku' =>  $product->reference,
-                'name' =>  $product->name,
-                'variant' =>  'Colour: Red, Size: Small',
-                'price' =>  25.00,
-                'quantity' =>  1,
-                'currency' => ''
+        foreach ($order->getProducts() as $product) {
+            $sfOrder['ecommerce']['purchase']['products'][] = array(
+                'sku' => $product['reference'],
+                'parent_sku' => $product['reference'],
+                'name' => $product['product_name'],
+                'price' => $product['total_price'],
+                'currency' => $currency->iso_code
             );
         }
 
         $this->smarty->assign(array(
             'sfOrder' => $sfOrder
         ));
-        return $this->display(__FILE__, 'salesfire.tpl');
+
+        return $this->display(__FILE__, 'order-success.tpl');
     }
 }
