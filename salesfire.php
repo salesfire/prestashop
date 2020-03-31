@@ -208,12 +208,29 @@ class Salesfire extends Module
      */
     public function hookHeader()
     {
-        $this->smarty->assign(
-            array(
-                'sfSiteId' => Tools::safeOutput(Configuration::get('SALESFIRE_SITE_ID'))
-            )
+        $smarty_variables = array(
+            'sfSiteId' => Tools::safeOutput(Configuration::get('SALESFIRE_SITE_ID')),
         );
-        return $this->display(__FILE__, 'salesfire.tpl');
+
+        $this->smarty->assign($smarty_variables);
+
+        $display = $this->display(__FILE__, 'salesfire.tpl');
+
+        if (method_exists($this->context->controller, 'getProduct')) {
+            $product = $this->context->controller->getProduct();
+
+            $smarty_variables['sfProduct'] = array(
+                'sku' => $product->reference,
+                'name' => $product->name,
+                'price' => $product->price
+            );
+
+            $this->smarty->assign($smarty_variables);
+
+            $display .= $this->display(__FILE__, 'product-views.tpl');
+        }
+
+        return $display;
     }
 
     public function hookOrderConfirmation($params)
