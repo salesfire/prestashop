@@ -175,8 +175,8 @@ class Salesfire extends Module
     protected function getConfigFormValues()
     {
         return array(
-            'SALESFIRE_ACTIVE' => Configuration::get('SALESFIRE_ACTIVE', true),
-            'SALESFIRE_SITE_ID' => Configuration::get('SALESFIRE_SITE_ID', null),
+            'SALESFIRE_ACTIVE' => Configuration::get('SALESFIRE_ACTIVE'),
+            'SALESFIRE_SITE_ID' => Configuration::get('SALESFIRE_SITE_ID'),
         );
     }
 
@@ -208,6 +208,10 @@ class Salesfire extends Module
      */
     public function hookHeader()
     {
+        if (!Configuration::get('SALESFIRE_ACTIVE')) {
+            return;
+        }
+
         $smarty_variables = array(
             'sfSiteId' => Tools::safeOutput(Configuration::get('SALESFIRE_SITE_ID')),
         );
@@ -235,6 +239,10 @@ class Salesfire extends Module
 
     public function hookOrderConfirmation($params)
     {
+        if (!Configuration::get('SALESFIRE_ACTIVE')) {
+            return;
+        }
+
         $order = $params['order'];
         $currency = Currency::getCurrencyInstance((int) $order->id_currency);
 

@@ -6,6 +6,8 @@
 	<description><![CDATA[Salesfire is a service that provides a number of tools that help to increase sales using various on site methods.]]></description>
 	<author><![CDATA[Salesfire]]></author>
 	<tab><![CDATA[smart_shopping]]></tab>
+	<confirmUninstall><![CDATA[Are you sure you want to uninstall Salesfire]]></confirmUninstall>
 	<is_configurable>1</is_configurable>
-	<need_instance>1</need_instance>
+	<need_instance>0</need_instance>
+	<limited_countries></limited_countries>
 </module>
