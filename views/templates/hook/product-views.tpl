@@ -29,7 +29,6 @@
       "ecommerce": {
           "view": {
               "sku": "{$sfProduct['sku']}",
-              "parent_sku": "{$sfProduct['sku']}",
               "name": "{$sfProduct['name']}",
               "price": {$sfProduct['price']}
               "currency": prestashop.currency.iso_code

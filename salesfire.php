@@ -36,7 +36,7 @@ class Salesfire extends Module
     {
         $this->name = 'salesfire';
         $this->tab = 'smart_shopping';
-        $this->version = '0.1.0';
+        $this->version = '0.2.0';
         $this->author = 'Salesfire';
         $this->need_instance = 0;
 
@@ -224,7 +224,7 @@ class Salesfire extends Module
             $product = $this->context->controller->getProduct();
 
             $smarty_variables['sfProduct'] = array(
-                'sku' => $product->reference,
+                'sku' => $product->product_id,
                 'name' => $product->name,
                 'price' => $product->price
             );
@@ -261,8 +261,8 @@ class Salesfire extends Module
 
         foreach ($order->getProducts() as $product) {
             $sfOrder['ecommerce']['purchase']['products'][] = array(
-                'sku' => $product['reference'],
-                'parent_sku' => $product['reference'],
+                'sku' => $product['product_id'],
+                'parent_sku' => $product['product_id'],
                 'name' => $product['product_name'],
                 'price' => $product['total_price'],
                 'currency' => $currency->iso_code

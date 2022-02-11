@@ -2,7 +2,7 @@
 <module>
 	<name>salesfire</name>
 	<displayName><![CDATA[Salesfire]]></displayName>
-	<version><![CDATA[0.1.0]]></version>
+	<version><![CDATA[0.2.0]]></version>
 	<description><![CDATA[Salesfire is a service that provides a number of tools that help to increase sales using various on site methods.]]></description>
 	<author><![CDATA[Salesfire]]></author>
 	<tab><![CDATA[smart_shopping]]></tab>
