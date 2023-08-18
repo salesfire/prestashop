@@ -34,10 +34,10 @@ class Salesfire extends Module
 
     public function __construct()
     {
-        $this->name = 'salesfire';
-        $this->tab = 'smart_shopping';
-        $this->version = '0.2.0';
-        $this->author = 'Salesfire';
+        $this->name          = 'salesfire';
+        $this->tab           = 'smart_shopping';
+        $this->version       = '0.2.1';
+        $this->author        = 'Salesfire';
         $this->need_instance = 0;
 
         /**
@@ -223,10 +223,14 @@ class Salesfire extends Module
         if (method_exists($this->context->controller, 'getProduct')) {
             $product = $this->context->controller->getProduct();
 
+            if (! Validate::isLoadedObject($product)) {
+                return $display;
+            }
+
             $smarty_variables['sfProduct'] = array(
-                'sku' => $product->product_id,
-                'name' => $product->name,
-                'price' => $product->price
+                'sku'   => $product->id,
+                'name'  => $product->name,
+                'price' => $product->price,
             );
 
             $this->smarty->assign($smarty_variables);
@@ -239,38 +243,43 @@ class Salesfire extends Module
 
     public function hookOrderConfirmation($params)
     {
-        if (!Configuration::get('SALESFIRE_ACTIVE')) {
+        if (! Configuration::get('SALESFIRE_ACTIVE')) {
             return;
         }
 
         $order = $params['order'];
+
+        if (! Validate::isLoadedObject($order)) {
+            return;
+        }
+
         $currency = Currency::getCurrencyInstance((int) $order->id_currency);
 
         $sfOrder = array(
             'ecommerce' => array(
                 'purchase' => array(
-                    'id' => $order->id,
-                    'revenue' => $order->total_paid_tax_excl,
-                    'shipping' => $order->total_shipping,
-                    'tax' => $order->total_paid_tax_incl - $order->total_paid_tax_excl,
+                    'id'       => $order->id,
+                    'revenue'  => (int) $order->total_paid_tax_excl,
+                    'shipping' => (int) $order->total_shipping,
+                    'tax'      => (int) $order->total_paid_tax_incl - (int) $order->total_paid_tax_excl,
                     'currency' => $currency->iso_code,
-                    'products' => array()
-                )
-            )
+                    'products' => array(),
+                ),
+            ),
         );
 
         foreach ($order->getProducts() as $product) {
             $sfOrder['ecommerce']['purchase']['products'][] = array(
-                'sku' => $product['product_id'],
+                'sku'        => $product['product_id'],
                 'parent_sku' => $product['product_id'],
-                'name' => $product['product_name'],
-                'price' => $product['total_price'],
-                'currency' => $currency->iso_code
+                'name'       => $product['product_name'],
+                'price'      => (int) $product['total_price'],
+                'currency'   => $currency->iso_code,
             );
         }
 
         $this->smarty->assign(array(
-            'sfOrder' => $sfOrder
+            'sfOrder' => $sfOrder,
         ));
 
         return $this->display(__FILE__, 'order-success.tpl');
