@@ -30,7 +30,7 @@
           "view": {
               "sku": "{$sfProduct['sku']}",
               "name": "{$sfProduct['name']}",
-              "price": {$sfProduct['price']}
+              "price": {$sfProduct['price']},
               "currency": prestashop.currency.iso_code
           }
       }
