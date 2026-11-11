@@ -231,7 +231,6 @@ class Salesfire extends Module
                 'sku'      => $product->id,
                 'name'     => $product->name,
                 'price'    => $product->price,
-                'currency' => $this->context->currency->iso_code,
             );
 
             $this->smarty->assign($smarty_variables);

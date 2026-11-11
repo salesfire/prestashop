@@ -31,7 +31,7 @@
               "sku": "{$sfProduct['sku']}",
               "name": "{$sfProduct['name']|escape:'javascript':'UTF-8' nofilter}",
               "price": {$sfProduct['price']},
-              "currency": "{$sfProduct['currency']}"
+              "currency": prestashop.currency.iso_code
           }
       }
   });
