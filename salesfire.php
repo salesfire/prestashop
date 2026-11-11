@@ -228,9 +228,9 @@ class Salesfire extends Module
             }
 
             $smarty_variables['sfProduct'] = array(
-                'sku'      => $product->id,
-                'name'     => $product->name,
-                'price'    => $product->price,
+                'sku'   => $product->id,
+                'name'  => $product->name,
+                'price' => $product->price,
             );
 
             $this->smarty->assign($smarty_variables);
