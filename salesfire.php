@@ -36,7 +36,7 @@ class Salesfire extends Module
     {
         $this->name          = 'salesfire';
         $this->tab           = 'smart_shopping';
-        $this->version       = '0.2.1';
+        $this->version       = '0.2.2';
         $this->author        = 'Salesfire';
         $this->need_instance = 0;
 
