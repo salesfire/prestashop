@@ -27,7 +27,12 @@
   window.sfDataLayer = window.sfDataLayer || [];
   window.sfDataLayer.push({
       "ecommerce": {
-          "view": {$sfProduct nofilter}
+          "view": {
+              "sku": "{$sfProduct['sku']}",
+              "name": "{$sfProduct['name']|escape:'javascript':'UTF-8' nofilter}",
+              "price": {$sfProduct['price']},
+              "currency": "{$sfProduct['currency']}"
+          }
       }
   });
 </script>

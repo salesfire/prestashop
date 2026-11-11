@@ -227,14 +227,11 @@ class Salesfire extends Module
                 return $display;
             }
 
-            $smarty_variables['sfProduct'] = json_encode(
-                array(
-                    'sku'      => (string) $product->id,
-                    'name'     => (string) $product->name,
-                    'price'    => (float) $product->price,
-                    'currency' => $this->context->currency->iso_code,
-                ),
-                JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+            $smarty_variables['sfProduct'] = array(
+                'sku'      => $product->id,
+                'name'     => $product->name,
+                'price'    => $product->price,
+                'currency' => $this->context->currency->iso_code,
             );
 
             $this->smarty->assign($smarty_variables);
@@ -283,7 +280,7 @@ class Salesfire extends Module
         }
 
         $this->smarty->assign(array(
-            'sfOrder' => json_encode($sfOrder, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT),
+            'sfOrder' => $sfOrder,
         ));
 
         return $this->display(__FILE__, 'order-success.tpl');
