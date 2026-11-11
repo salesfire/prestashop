@@ -27,12 +27,7 @@
   window.sfDataLayer = window.sfDataLayer || [];
   window.sfDataLayer.push({
       "ecommerce": {
-          "view": {
-              "sku": "{$sfProduct['sku']}",
-              "name": "{$sfProduct['name']}",
-              "price": {$sfProduct['price']},
-              "currency": prestashop.currency.iso_code
-          }
+          "view": {$sfProduct nofilter}
       }
   });
 </script>

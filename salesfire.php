@@ -36,7 +36,7 @@ class Salesfire extends Module
     {
         $this->name          = 'salesfire';
         $this->tab           = 'smart_shopping';
-        $this->version       = '0.2.1';
+        $this->version       = '0.2.2';
         $this->author        = 'Salesfire';
         $this->need_instance = 0;
 
@@ -227,10 +227,14 @@ class Salesfire extends Module
                 return $display;
             }
 
-            $smarty_variables['sfProduct'] = array(
-                'sku'   => $product->id,
-                'name'  => $product->name,
-                'price' => $product->price,
+            $smarty_variables['sfProduct'] = json_encode(
+                array(
+                    'sku'      => (string) $product->id,
+                    'name'     => (string) $product->name,
+                    'price'    => (float) $product->price,
+                    'currency' => $this->context->currency->iso_code,
+                ),
+                JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
             );
 
             $this->smarty->assign($smarty_variables);
@@ -279,7 +283,7 @@ class Salesfire extends Module
         }
 
         $this->smarty->assign(array(
-            'sfOrder' => $sfOrder,
+            'sfOrder' => json_encode($sfOrder, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT),
         ));
 
         return $this->display(__FILE__, 'order-success.tpl');
